@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Users {
+  user_id                    Int       @id @default(autoincrement())
+  first_name                 String
+  last_name                  String
+  email                      String    @unique
+  password                   String
+  profile_image              String?   // اختياري
+  account_number             String    @unique // 12 رقم مخزنة كسلسلة
+  verified_code              String?   @db.VarChar(12)
+  is_verified                Boolean   @default(false)
+  password_changed           Boolean   @default(false)
+  identity_image_front       String?
+  identity_image_back        String?
+  city_id                    Int
+  village_id                 Int
+  identity_image_is_verified Boolean   @default(false)
+  is_active                  Boolean   @default(true)
+  notification_id            Int
+  password_changed_at        DateTime?
+  verified_at                DateTime?
+  changed_at                 DateTime? @updatedAt
+  created_at                 DateTime  @default(now())
+  city City @relation (fields:[city_id], references: [city_id])
+  village Village @relation (fields:[village_id], references:[village_id])
+  location Location_map_user[]
+  notifications_map_user Notifications_map_user[]
+  reviews_made     ratings_and_reviews[] @relation("ReviewerRelation")
+  reviews_received ratings_and_reviews[] @relation("ReviewedRelation")
+}
+
+
+model City {
+  city_id Int  @default(autoincrement()) @id
+  city_name String
+  users Users[]
+}
+
+model Village {
+  village_id Int  @default(autoincrement()) @id
+  village_name String
+  users Users[]
+}
+
+//كسر علاقة ال m:n
+model Location_map_user {
+  location_map_user_id Int @id @default(autoincrement())
+  user_id Int //fk
+  location_id Int //fk
+  name_location String // اسم مكانك الجديد
+  users Users @relation(fields:[user_id] ,references:[user_id])
+  loction Location @relation (fields:[location_id] , references:[location_id])
+}
+
+model Location {
+  location_id Int @id @default(autoincrement())
+  latitude String
+  longitude String
+  accuracy String
+  location Location_map_user[]
+}
+
+model  Notifications {
+  notification_id Int  @id @default(autoincrement())
+  notification_type String
+  title String
+  message String
+  is_read Boolean
+  created_at DateTime
+  notifications_map_user Notifications_map_user[]
+}
+
+
+model Notifications_map_user { 
+  map_id Int @id @default(autoincrement())
+  user_id Int
+  notification_id Int
+  created_at DateTime
+  changed_at DateTime @updatedAt
+  users Users @relation (fields:[user_id],references:[user_id])
+  notifications Notifications @relation (fields:[notification_id],references:[notification_id])
+}
+
+model ratings_and_reviews {
+  review_id Int @id @default(autoincrement())
+  reviewer_id Int 
+  user_id Int 
+  reviewed_id Int
+  product_id Int
+  rating Int
+  comment String
+  created_at DateTime @default(now())
+  cahnged_at DateTime @updatedAt
+  users_reviewer Users @relation("ReviewerRelation",fields:[reviewer_id],references:[user_id])
+  users_reviewed Users  @relation("ReviewedRelation",fields:[reviewed_id],references:[user_id])
+  // لسا بدك تكمل تضيف للبرودكت وللستور 
+}
+
