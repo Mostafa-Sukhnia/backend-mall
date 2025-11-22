@@ -8,281 +8,276 @@ datasource db {
 }
 
 model Users {
-  user_id                    Int       @id @default(autoincrement())
+  user_id                    Int                      @id @default(autoincrement())
   first_name                 String
   last_name                  String
-  email                      String    @unique
+  email                      String                   @unique
   password                   String
-  profile_image              String?   // اختياري
-  account_number             String    @unique // 12 رقم مخزنة كسلسلة
-  verified_code              String?   @db.VarChar(12)
-  is_verified                Boolean   @default(false)
-  password_changed           Boolean   @default(false)
+  profile_image              String?
+  account_number             String                   @unique
+  verified_code              String?                  @db.VarChar(12)
+  is_verified                Boolean                  @default(false)
+  password_changed           Boolean                  @default(false)
   identity_image_front       String?
   identity_image_back        String?
   city_id                    Int
   village_id                 Int
-  identity_image_is_verified Boolean   @default(false)
-  is_active                  Boolean   @default(true)
+  identity_image_is_verified Boolean                  @default(false)
+  is_active                  Boolean                  @default(true)
   notification_id            Int
   password_changed_at        DateTime?
   verified_at                DateTime?
-  changed_at                 DateTime? @updatedAt
-  created_at                 DateTime  @default(now())
-  city City @relation (fields:[city_id], references: [city_id])
-  village Village @relation (fields:[village_id], references:[village_id])
-  location Location_map_user[]
-  notifications_map_user Notifications_map_user[]
-  reviews_made     Ratings_and_reviews[] @relation("ReviewerRelation")
-  reviews_received Ratings_and_reviews[] @relation("ReviewedRelation")
-  user_role_store User_store_map[]
-  product_wish_list Wish_list[] 
-  order Order[]
-  cart Carts[]
+  changed_at                 DateTime?                @updatedAt
+  created_at                 DateTime                 @default(now())
+  cart                       Carts[]
+  location                   Location_map_user[]
+  notifications_map_user     Notifications_map_user[]
+  order                      Order[]
+  reviews_received           Ratings_and_reviews[]    @relation("ReviewedRelation")
+  reviews_made               Ratings_and_reviews[]    @relation("ReviewerRelation")
+  user_role_store            User_store_map[]
+  city                       City                     @relation(fields: [city_id], references: [city_id])
+  village                    Village                  @relation(fields: [village_id], references: [village_id])
+  product_wish_list          Wish_list[]
 }
 
-
 model City {
-  city_id Int  @default(autoincrement()) @id
+  city_id   Int     @id @default(autoincrement())
   city_name String
-  users Users[]
+  users     Users[]
 }
 
 model Village {
-  village_id Int  @default(autoincrement()) @id
+  village_id   Int     @id @default(autoincrement())
   village_name String
-  users Users[]
+  users        Users[]
 }
 
-//كسر علاقة ال m:n
 model Location_map_user {
-  location_map_user_id Int @id @default(autoincrement())
-  user_id Int //fk
-  location_id Int //fk
-  name_location String // اسم مكانك الجديد
-  users Users @relation(fields:[user_id] ,references:[user_id])
-  location Location @relation (fields:[location_id] , references:[location_id])
+  location_map_user_id Int      @id @default(autoincrement())
+  user_id              Int
+  location_id          Int
+  name_location        String
+  location             Location @relation(fields: [location_id], references: [location_id])
+  users                Users    @relation(fields: [user_id], references: [user_id])
 }
 
 model Location {
-  location_id Int @id @default(autoincrement())
-  latitude String
-  longitude String
-  accuracy String
-  location Location_map_user[]
+  location_id    Int                 @id @default(autoincrement())
+  latitude       String
+  longitude      String
+  accuracy       String
+  location       Location_map_user[]
   store_location Store_location[]
 }
 
-model  Notifications {
-  notification_id Int  @id @default(autoincrement())
-  notification_type String
-  title String
-  message String
-  is_read Boolean
-  created_at DateTime
+model Notifications {
+  notification_id        Int                      @id @default(autoincrement())
+  notification_type      String
+  title                  String
+  message                String
+  is_read                Boolean
+  created_at             DateTime
   notifications_map_user Notifications_map_user[]
 }
 
-
-model Notifications_map_user { 
-  map_id Int @id @default(autoincrement())
-  user_id Int
+model Notifications_map_user {
+  map_id          Int           @id @default(autoincrement())
+  user_id         Int
   notification_id Int
-  created_at DateTime
-  changed_at DateTime @updatedAt
-  users Users @relation (fields:[user_id],references:[user_id])
-  notifications Notifications @relation (fields:[notification_id],references:[notification_id])
+  created_at      DateTime
+  changed_at      DateTime      @updatedAt
+  notifications   Notifications @relation(fields: [notification_id], references: [notification_id])
+  users           Users         @relation(fields: [user_id], references: [user_id])
 }
 
 model Ratings_and_reviews {
-  review_id Int @id @default(autoincrement())
-  reviewer_id Int 
-  user_id Int 
-  reviewed_id Int
-  product_id Int
-  store_id Int
-  rating Int
-  comment String
-  created_at DateTime @default(now())
-  cahnged_at DateTime @updatedAt
-  users_reviewer Users @relation("ReviewerRelation",fields:[reviewer_id],references:[user_id])
-  users_reviewed Users  @relation("ReviewedRelation",fields:[reviewed_id],references:[user_id])
-  store_review  Stores @relation(fields: [store_id], references: [store_id])
-  // لسا بدك تكمل تضيف للبرودكت وللستور 
+  review_id      Int      @id @default(autoincrement())
+  reviewer_id    Int
+  user_id        Int
+  reviewed_id    Int
+  product_id     Int
+  store_id       Int
+  rating         Int
+  comment        String
+  created_at     DateTime @default(now())
+  cahnged_at     DateTime @updatedAt
+  users_reviewed Users    @relation("ReviewedRelation", fields: [reviewed_id], references: [user_id])
+  users_reviewer Users    @relation("ReviewerRelation", fields: [reviewer_id], references: [user_id])
+  store_review   Stores   @relation(fields: [store_id], references: [store_id])
 }
 
 model Stores {
-  store_id Int @id @default(autoincrement())
-  store_name String
-  store_description String
-  logo_image String
-  phon_number String
-  store_location Store_location[]
-  user_role User_store_map[]
-  store_category_maps Store_category_maps[]
+  store_id            Int                   @id @default(autoincrement())
+  store_name          String
+  store_description   String
+  logo_image          String
+  phon_number         String
+  products            Products[]
   ratings_and_reviews Ratings_and_reviews[]
-  products Products[]
-  store_stock Stock[]
+  store_stock         Stock[]
+  store_category_maps Store_category_maps[]
+  store_location      Store_location[]
+  user_role           User_store_map[]
 }
 
 model Store_location {
-  store_location_id Int @id @default(autoincrement())
-  store_id Int
-  location_id Int
-  locatio_name String
-  store Stores @relation(fields:[store_id], references:[store_id])
-  location Location @relation(fields:[location_id], references:[location_id])
+  store_location_id Int      @id @default(autoincrement())
+  store_id          Int
+  location_id       Int
+  locatio_name      String
+  location          Location @relation(fields: [location_id], references: [location_id])
+  store             Stores   @relation(fields: [store_id], references: [store_id])
 }
 
-model User_store_map { // كاسر علاقات
-  map_id Int @id @default(autoincrement())
-  user_id Int 
-  store_id Int 
-  role_id Int  
-  user Users @relation(fields: [user_id],references:[user_id])
-  role Roles @relation(fields: [role_id], references: [role_id])
-  store Stores @relation(fields: [store_id], references: [store_id])
+model User_store_map {
+  map_id   Int    @id @default(autoincrement())
+  user_id  Int
+  store_id Int
+  role_id  Int
+  role     Roles  @relation(fields: [role_id], references: [role_id])
+  store    Stores @relation(fields: [store_id], references: [store_id])
+  user     Users  @relation(fields: [user_id], references: [user_id])
 }
 
 model Roles {
-  role_id Int  @id @default(autoincrement())
-  role_name String @unique
-  description String 
+  role_id         Int                 @id @default(autoincrement())
+  role_name       String              @unique
+  description     String
   role_permission Roles_permissions[]
-  user_store User_store_map[]
+  user_store      User_store_map[]
 }
 
 model Roles_permissions {
-  map_id Int @id @default(autoincrement())
-  role_id Int
+  map_id           Int         @id @default(autoincrement())
+  role_id          Int
   permissions_name String
-  permission_id Int 
-  role Roles @relation(fields:[role_id],references:[role_id])
-  permissions Permissions @relation(fields:[permission_id],references:[permission_id])
+  permission_id    Int
+  permissions      Permissions @relation(fields: [permission_id], references: [permission_id])
+  role             Roles       @relation(fields: [role_id], references: [role_id])
 }
 
 model Permissions {
-  permission_id Int @id @default(autoincrement())
-  name String @unique
-  description String?
+  permission_id   Int                 @id @default(autoincrement())
+  name            String              @unique
+  description     String?
   permission_role Roles_permissions[]
 }
 
 model Store_category_maps {
-  map_id Int @id @default(autoincrement())
-  store_id Int // fk
-  categories_id Int // fk
-  store Stores @relation(fields: [store_id], references: [store_id])
-  categories Store_categories @relation(fields: [categories_id], references:[categories_id])
+  map_id        Int              @id @default(autoincrement())
+  store_id      Int
+  categories_id Int
+  categories    Store_categories @relation(fields: [categories_id], references: [categories_id])
+  store         Stores           @relation(fields: [store_id], references: [store_id])
 }
 
 model Store_categories {
-  categories_id Int @id @default(autoincrement())
-  category_name String @unique
+  categories_id        Int                   @id @default(autoincrement())
+  category_name        String                @unique
   category_description String
-  store_category_maps Store_category_maps[]
+  store_category_maps  Store_category_maps[]
 }
 
 model Products {
-  product_id Int @id @default(autoincrement())
-  product_name String
-  product_description String 
-  product_price Float
-  store_id Int
-  product_store Stores @relation(fields: [store_id], references: [store_id])
-  category_product Product_categories[]
-  Product_attribute Product_attribute[]
-  products_images Products_images[]
-  product_wish_list Wish_list[]
-  product_stock  Stock[]
-  products Order_items[]
+  product_id          Int                 @id @default(autoincrement())
+  product_name        String
+  product_description String
+  product_price       Float
+  store_id            Int
+  products            Order_items[]
+  Product_attribute   Product_attribute[]
+  category_product    Product_categories?
+  product_store       Stores              @relation(fields: [store_id], references: [store_id])
+  products_images     Products_images[]
+  product_stock       Stock[]
+  product_wish_list   Wish_list[]
 }
 
 model Product_categories {
-  category_id Int @id @default(autoincrement()) 
-  category_name String
+  category_id          Int      @id @default(autoincrement())
+  category_name        String
   category_description String
-  product_id Int @unique
-  category_product Products @relation(fields: [product_id], references: [product_id])
+  product_id           Int      @unique
+  category_product     Products @relation(fields: [product_id], references: [product_id])
 }
 
 model Product_attribute {
-  id_attribute Int @id @default(autoincrement())
-  name_attribute String
-  attribute_value String[]
-  attribute_unite String[]
-  product_id Int
-  product_attribute  Products @relation(fields: [product_id], references: [product_id])
+  id_attribute      Int      @id @default(autoincrement())
+  name_attribute    String
+  attribute_value   String[]
+  attribute_unite   String[]
+  product_id        Int
+  product_attribute Products @relation(fields: [product_id], references: [product_id])
 }
 
 model Products_images {
-  image_id Int @id @default(autoincrement())
-  product_image String
-  product_id Int // fk
-  products_images Products @relation(fields:[product_id], references: [product_id])
+  image_id        Int      @id @default(autoincrement())
+  product_image   String
+  product_id      Int
+  products_images Products @relation(fields: [product_id], references: [product_id])
 }
 
 model Wish_list {
-  wish_list_id Int @id @default(autoincrement())
-  user_id Int
-  product_id Int
-  created_at DateTime
-  users_wish_list Users @relation(fields: [user_id], references: [user_id])
+  wish_list_id      Int      @id @default(autoincrement())
+  user_id           Int
+  product_id        Int
+  created_at        DateTime
   product_wish_list Products @relation(fields: [product_id], references: [product_id])
-} 
+  users_wish_list   Users    @relation(fields: [user_id], references: [user_id])
+}
 
 model Stock {
-  stock_id Int @id @default(autoincrement())
-  quantity Int
-  reserved_quantity Int // محجوزات يعني طلبهم الزبون
-  sold_quantity Int
-  store_id Int // fk
-  product_id Int // fk
-  last_changed_at DateTime
-  created_at DateTime
-  changed_at DateTime @updatedAt
-  product_stock Products @relation(fields: [product_id], references: [product_id])
-  store_stock Stores @relation(fields: [store_id], references: [store_id])
+  stock_id          Int      @id @default(autoincrement())
+  quantity          Int
+  reserved_quantity Int
+  sold_quantity     Int
+  store_id          Int
+  product_id        Int
+  last_changed_at   DateTime
+  created_at        DateTime
+  changed_at        DateTime @updatedAt
+  product_stock     Products @relation(fields: [product_id], references: [product_id])
+  store_stock       Stores   @relation(fields: [store_id], references: [store_id])
 }
 
 model Order_items {
-  item_id Int @id @default(autoincrement())
-  order_id Int // fk
-  product_id Int // fk
-  quantity Int
+  item_id           Int      @id @default(autoincrement())
+  order_id          Int
+  product_id        Int
+  quantity          Int
   price_at_purchase Float
-  total Float
-  order_item Order @relation(fields: [order_id], references: [order_id])
-  product_item Products @relation(fields: [product_id], references: [product_id])
+  total             Float
+  order_item        Order    @relation(fields: [order_id], references: [order_id])
+  product_item      Products @relation(fields: [product_id], references: [product_id])
 }
 
-
 model Order {
-  order_id Int @id @default(autoincrement())
-  user_id Int // fk
-  total Float
-  status String
+  order_id   Int           @id @default(autoincrement())
+  user_id    Int
+  total      Float
+  status     String
   created_at DateTime
-  latitude String
-  longitude String
-  accuracy String
+  latitude   String
+  longitude  String
+  accuracy   String
+  user_order Users         @relation(fields: [user_id], references: [user_id])
   order_item Order_items[]
-  user_order Users @relation(fields: [user_id], references: [user_id])
 }
 
 model Carts {
-cart_id Int  @id @default(autoincrement()) //PK
-user_id Int //FK
-created_at DateTime
-updated_at DateTime
-carts_user Users @relation(fields: [user_id], references: [user_id])
-cart_items Cart_items[]
+  cart_id    Int          @id @default(autoincrement())
+  user_id    Int
+  created_at DateTime
+  updated_at DateTime
+  cart_items Cart_items[]
+  carts_user Users        @relation(fields: [user_id], references: [user_id])
 }
 
 model Cart_items {
-item_id Int @id @default(autoincrement())
-cart_id Int //fk
-product_id Int //FK
-quantity Int
-carts_cart_id Carts @relation(fields: [cart_id], references: [cart_id])
+  item_id       Int   @id @default(autoincrement())
+  cart_id       Int
+  product_id    Int
+  quantity      Int
+  carts_cart_id Carts @relation(fields: [cart_id], references: [cart_id])
 }
