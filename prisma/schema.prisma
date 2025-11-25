@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -13,19 +13,19 @@ model Users {
   last_name                  String
   email                      String                   @unique
   password                   String
-  profile_image              String?
-  account_number             String                   @unique
-  verified_code              String?                  @db.VarChar(12)
+  date_of_birth              DateTime
+  profile_image              String?                  @default("http://localhost:5500/uploads/images/defaultUser.jpg")
+  verified_code              Int?                  
   is_verified                Boolean                  @default(false)
   password_changed           Boolean                  @default(false)
   identity_image_front       String?
   identity_image_back        String?
   city_id                    Int
   village_id                 Int
+  phone_number               String?                  @unique
   identity_image_is_verified Boolean                  @default(false)
   is_active                  Boolean                  @default(true)
-  notification_id            Int
-  password_changed_at        DateTime?
+  password_changed_at        DateTime? //هون اخر حقل
   verified_at                DateTime?
   changed_at                 DateTime?                @updatedAt
   created_at                 DateTime                 @default(now())
@@ -36,22 +36,25 @@ model Users {
   reviews_received           Ratings_and_reviews[]    @relation("ReviewedRelation")
   reviews_made               Ratings_and_reviews[]    @relation("ReviewerRelation")
   user_role_store            User_store_map[]
-  city                       City                     @relation(fields: [city_id], references: [city_id])
   village                    Village                  @relation(fields: [village_id], references: [village_id])
   product_wish_list          Wish_list[]
 }
 
 model City {
-  city_id   Int     @id @default(autoincrement())
-  city_name String
-  users     Users[]
+  city_id   Int      @id @default(autoincrement())
+  city_name String   @unique
+  villages  Village[]
 }
 
+
 model Village {
-  village_id   Int     @id @default(autoincrement())
-  village_name String
-  users        Users[]
+  village_id   Int      @id @default(autoincrement())
+  village_name String   @unique
+  city_id      Int
+  city         City     @relation(fields: [city_id], references: [city_id])
+  users        Users[] 
 }
+
 
 model Location_map_user {
   location_map_user_id Int      @id @default(autoincrement())

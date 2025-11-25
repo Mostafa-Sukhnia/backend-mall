@@ -3,13 +3,18 @@ import { PORT } from "./config/env.js";
 import {loginRouter} from "./Router/login.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-
+import signupRouter from "./Router/signup.js";
+import verifyAccountRouter from "./Router/verifyAccount.js";
+import regenerateOtp from "./Router/regenerateOtp.js"
 dotenv.config();
 const app = express();
+app.use("/uploads", express.static("uploads"));
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/login", loginRouter);
-
+app.use("/api/signup", signupRouter);
+app.use("/api/verify-account", verifyAccountRouter);
+app.use("/api/regenerate-otp", regenerateOtp);
 app.get("/", (req, res) => {
     res.send("Server is running");
 });
