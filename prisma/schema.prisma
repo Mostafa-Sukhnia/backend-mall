@@ -15,7 +15,9 @@ model Users {
   password                   String
   date_of_birth              DateTime
   profile_image              String?                  @default("http://localhost:5500/uploads/images/defaultUser.jpg")
-  verified_code              Int?                  
+  verified_code              Int 
+  verified_phone_code        Int?                
+  is_phone_verified          Boolean?                  @default(false)                 
   is_verified                Boolean                  @default(false)
   password_changed           Boolean                  @default(false)
   identity_image_front       String?
