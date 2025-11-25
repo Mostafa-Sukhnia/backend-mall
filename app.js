@@ -13,12 +13,12 @@ const app = express();
 app.use("/uploads", express.static("uploads"));
 app.use(cookieParser());
 app.use(express.json());
-app.use("/api/login", loginRouter);
-app.use("/api/signup", signupRouter);
-app.use("/api/verify-account", verifyAccountRouter);
-app.use("/api/verify-phon-number", verifyPhonNumberRouter);
-app.use("/api/regenerate-otp", regenerateOtp);
-app.use("/api/regenerate-Otp-Phone-Number", regenerateOtpPhoneNumber);
+app.use("/api/v1/login", loginRouter);
+app.use("/api/v1/signup", signupRouter);
+app.use("/api/v1/verify-account", verifyAccountRouter);
+app.use("/api/v1/verify-phon-number", verifyPhonNumberRouter);
+app.use("/api/v1/regenerate-otp", regenerateOtp);
+app.use("/api/v1/regenerate-Otp-Phone-Number", regenerateOtpPhoneNumber);
 app.get("/", (req, res) => {
     res.send("Server is running");
 });
