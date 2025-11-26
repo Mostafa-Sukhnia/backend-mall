@@ -17,6 +17,8 @@ regenerateOtpPhoneNumber.post("/", async (req, res) => {
       return res
         .status(400)
         .json({ message: "user not found your phone number is not correct" });
+    } else if (user.is_phone_verified === true) {
+      return res.status(400).json({ message: "phone number already verified" });
     } else {
       const updateUserCode = await prisma.users.update({
         where: {
@@ -26,7 +28,6 @@ regenerateOtpPhoneNumber.post("/", async (req, res) => {
           verified_phone_code: code,
         },
       });
-      // sendTelegramOTP(number, code);
       res
         .status(200)
         .json({ message: "code generated succsfuly", updateUserCode });
