@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { upload } from "../lib/upload.js";
 import { sendDevEmail } from "../lib/mail.js";
-import generateOTP from "../lib/generateOtp.js";
+import generateOTP from "../lib/generateOTP.js";
 import { hashPassword } from "../lib/auth.js";
 import { prisma } from "../lib/prisma.js";
-import {sendTelegramOTP} from "../lib/telOtp.js";
+
 import {
   validateEmail,
   vallidatePassword,
@@ -52,10 +52,8 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
     return res.status(400).json({ message: `Location error: ${message}` });
   } else {
     const code = generateOTP();
-    const phone_code = generateOTP();
     const filePath = `/uploads/images/${req.file.filename}`;
     await sendDevEmail(email, code);
-    await sendTelegramOTP(phone_number, phone_code);
     const hashedPassword = await hashPassword(password);
 
     const location = await prisma.location.create({
