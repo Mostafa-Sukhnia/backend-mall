@@ -52,8 +52,8 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
     return res.status(400).json({ message: `Location error: ${message}` });
   } else {
     const code = generateOTP();
+    const phone_code = generateOTP();
     const filePath = `/uploads/images/${req.file.filename}`;
-    await sendDevEmail(email, code);
     const hashedPassword = await hashPassword(password);
 
     const location = await prisma.location.create({
@@ -73,7 +73,7 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
         phone_number,
         verified_phone_code: phone_code,
         password: hashedPassword,
-        date_of_birth:dateOfBirth,
+        date_of_birth: dateOfBirth,
         profile_image: filePath,
         verified_code: code,
       },
@@ -94,6 +94,7 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
         location_map_user,
       },
     });
+    await sendDevEmail(email, code);
   }
 });
 
