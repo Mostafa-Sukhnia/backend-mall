@@ -14,7 +14,7 @@ verifyPhoneNumberRouter.post("/", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const OTP_EXPIRATION_MINUTES = 10;
+    const OTP_EXPIRATION_MINUTES = 15;
     const now = new Date();
     const otpTime = new Date(user.changed_at || user.created_at); // fallback
     const diffMinutes = (now - otpTime) / 1000 / 60;

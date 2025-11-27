@@ -7,6 +7,20 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Gender {
+  Male
+  Female
+}
+enum UserRole {
+  ADMIN
+  USER
+}
+enum identity_verification_status {
+  NONE
+  PENDING
+  VERIFIED
+  REJECTED
+}
 model Users {
   user_id                    Int                      @id @default(autoincrement())
   first_name                 String
@@ -23,10 +37,13 @@ model Users {
   password_reset_code_verified Boolean                @default(false) 
   identity_image_front       String?
   identity_image_back        String?
+  identity_verification_status identity_verification_status? @default(NONE)
+  gender                     Gender
   city_id                    Int
   village_id                 Int
-  phone_number               String?                  @unique  // لازم يكون ضروري
-  identity_image_is_verified Boolean                  @default(false)
+  UserRole                   UserRole                 @default(USER)  
+  phone_number               String                  @unique 
+  current_token              String?                  @unique
   is_active                  Boolean                  @default(true)
   password_changed_at        DateTime? //هون اخر حقل
   verified_at                DateTime?
@@ -82,7 +99,7 @@ model Notifications {
   notification_type      String
   title                  String
   message                String
-  is_read                Boolean
+  is_read                Boolean                 @default(false)
   created_at             DateTime
   notifications_map_user Notifications_map_user[]
 }
@@ -91,7 +108,7 @@ model Notifications_map_user {
   map_id          Int           @id @default(autoincrement())
   user_id         Int
   notification_id Int
-  created_at      DateTime
+  created_at      DateTime      
   changed_at      DateTime      @updatedAt
   notifications   Notifications @relation(fields: [notification_id], references: [notification_id])
   users           Users         @relation(fields: [user_id], references: [user_id])

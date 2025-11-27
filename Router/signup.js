@@ -13,49 +13,67 @@ import {
   validatePhoneNumber,
   validateLocation,
 } from "../lib/regEx.js";
+
 const signupRouter = Router();
 
 signupRouter.post("/", upload.single("image"), async (req, res) => {
-  const {
-    first_name,
-    last_name,
-    email,
-    password,
-    dateOfBirth,
-    city_id,
-    village_id,
-    phone_number,
-    latitude,
-    longitude,
-    accuracy,
-  } = req.body;
-  if (!validateEmail(email)) {
-    return res.status(400).json({ message: "Invalid email format." });
-  } else if (!vallidatePassword(password)) {
-    return res
-      .status(400)
-      .json({ message: "Password does not meet complexity requirements." });
-  } else if (!validateUsername(first_name) || !validateUsername(last_name)) {
-    return res
-      .status(400)
-      .json({ message: "Invalid first name or last name format." });
-  } else if (!validateDateOfBirth(dateOfBirth)) {
-    return res
-      .status(400)
-      .json({ message: "Invalid date of birth format. Use YYYY-MM-DD." });
-  } else if (!req.file) {
-    return res.status(400).json({ message: "Profile image is required." });
-  } else if (!validatePhoneNumber(phone_number)) {
-    return res.status(400).json({ message: "Invalid phone number format." });
-  } else if (!validateLocation({ latitude, longitude, accuracy }).valid) {
-    const { message } = validateLocation({ latitude, longitude, accuracy });
-    return res.status(400).json({ message: `Location error: ${message}` });
-  } else {
+  try {
+    const {
+      first_name,
+      last_name,
+      email,
+      password,
+      dateOfBirth,
+      city_id,
+      village_id,
+      phone_number,
+      latitude,
+      longitude,
+      accuracy,
+      UserRole,
+      gender,
+    } = req.body;
+
+    // التحقق من صحة البيانات
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: "Invalid email format." });
+    }
+    if (!vallidatePassword(password)) {
+      return res
+        .status(400)
+        .json({ message: "Password does not meet complexity requirements." });
+    }
+    if (!validateUsername(first_name) || !validateUsername(last_name)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid first name or last name format." });
+    }
+    if (!validateDateOfBirth(dateOfBirth)) {
+      return res
+        .status(400)
+        .json({ message: "Invalid date of birth format. Use YYYY-MM-DD." });
+    }
+    if (!validatePhoneNumber(phone_number)) {
+      return res.status(400).json({ message: "Invalid phone number format." });
+    }
+    if (!validateLocation({ latitude, longitude, accuracy }).valid) {
+      const { message } = validateLocation({ latitude, longitude, accuracy });
+      return res.status(400).json({ message: `Location error: ${message}` });
+    }
+
+    // إنشاء الأكواد المولدة
     const code = generateOTP();
     const phone_code = generateOTP();
-    const filePath = `/uploads/images/${req.file.filename}`;
+
+    // الصورة: إذا لم يرسل المستخدم صورة استخدم الافتراضية
+    const filePath = req.file
+      ? `/uploads/images/${req.file.filename}`
+      : "http://localhost:5500/uploads/images/defaultUser.jpg";
+
+    // تشفير الباسورد
     const hashedPassword = await hashPassword(password);
 
+    // إنشاء الموقع
     const location = await prisma.location.create({
       data: {
         latitude: latitude.toString(),
@@ -63,6 +81,8 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
         accuracy: accuracy.toString(),
       },
     });
+
+    // إنشاء المستخدم
     const user = await prisma.users.create({
       data: {
         first_name,
@@ -76,8 +96,12 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
         date_of_birth: dateOfBirth,
         profile_image: filePath,
         verified_code: code,
+        UserRole,
+        gender,
       },
     });
+
+    // ربط الموقع بالمستخدم
     const location_map_user = await prisma.location_map_user.create({
       data: {
         user_id: user.user_id,
@@ -85,6 +109,11 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
         name_location: "home location",
       },
     });
+
+    // إرسال البريد التجريبي
+    await sendDevEmail(email, code);
+
+    // الرد على العميل
     res.status(201).json({
       success: true,
       message: "User registered successfully",
@@ -94,7 +123,9 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
         location_map_user,
       },
     });
-    await sendDevEmail(email, code);
+  } catch (error) {
+    console.error("Error in signupRouter:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

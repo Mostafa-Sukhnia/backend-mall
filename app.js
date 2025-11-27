@@ -1,17 +1,20 @@
 import express from "express";
 import { PORT } from "./config/env.js";
-import {loginRouter} from "./Router/login.js";
+import { loginRouter } from "./Router/login.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import signupRouter from "./Router/signup.js";
 import verifyAccountRouter from "./Router/verifyAccount.js";
-import regenerateOtp from "./Router/regenerateOtp.js"
+import regenerateOtp from "./Router/regenerateOtp.js";
 import verifyPhonNumberRouter from "./Router/verifyPhonNumber.js";
 import regenerateOtpPhoneNumber from "./Router/regenerateOtpPhone.js";
 import askForChangePasswordRouter from "./Router/askForChangePassword.js";
 import verifyChangePasswordRouter from "./Router/verifyChangePassword.js";
-import changePassword from "./Router/changePassword.js"
-import bot from './lib/bot.js';
+import changePassword from "./Router/changePassword.js";
+import acceptidentityRouter from "./Router/acceptIdentity.js";
+import bot from "./lib/bot.js";
+import askForIdentityImageVerifier from "./Router/askForIdentityImageVerifie.js";
+import logoutRouter from "./Router/logout.js";
 dotenv.config();
 const app = express();
 app.use("/uploads", express.static("uploads"));
@@ -26,11 +29,14 @@ app.use("/api/v1/regenerate-Otp-Phone-Number", regenerateOtpPhoneNumber);
 app.use("/api/v1/ask-for-change-password", askForChangePasswordRouter);
 app.use("/api/v1/verify-change-password-router", verifyChangePasswordRouter);
 app.use("/api/v1/change-password", changePassword);
+app.use("/api/v1/ask-for-identity-image-verifier", askForIdentityImageVerifier);
+app.use("/api/v1/accept-identity", acceptidentityRouter);
+app.use("/api/v1/logout", logoutRouter);
 
 app.get("/", (req, res) => {
-    res.send("Server is running");
+  res.send("Server is running");
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
