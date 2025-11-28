@@ -21,6 +21,11 @@ enum identity_verification_status {
   VERIFIED
   REJECTED
 }
+enum state_of_create_store {
+  PENDING
+  VERIFIED
+  REJECTED
+}
 model Users {
   user_id                    Int                      @id @default(autoincrement())
   first_name                 String
@@ -28,7 +33,7 @@ model Users {
   email                      String                   @unique
   password                   String
   date_of_birth              DateTime
-  profile_image              String?                  @default("http://localhost:5500/uploads/images/defaultUser.jpg")
+  profile_image              String?                  @default("http://localhost:5500/uploads/images/defaultUser.png")
   verified_code              Int 
   verified_phone_code        Int?                
   is_phone_verified          Boolean?                 @default(false)                 
@@ -134,8 +139,11 @@ model Stores {
   store_id            Int                   @id @default(autoincrement())
   store_name          String
   store_description   String
-  logo_image          String
-  phon_number         String
+  logo_image          String?   @default("http://localhost:5500/uploads/images/defaultStore.jpg")
+  phon_number         String @unique
+  state_of_create_store state_of_create_store @default(PENDING)
+  verified_phone_code        Int?                
+  is_phone_verified          Boolean?                 @default(false)                 
   products            Products[]
   ratings_and_reviews Ratings_and_reviews[]
   store_stock         Stock[]

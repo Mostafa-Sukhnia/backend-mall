@@ -68,7 +68,7 @@ signupRouter.post("/", upload.single("image"), async (req, res) => {
     // الصورة: إذا لم يرسل المستخدم صورة استخدم الافتراضية
     const filePath = req.file
       ? `/uploads/images/${req.file.filename}`
-      : "http://localhost:5500/uploads/images/defaultUser.jpg";
+      : "http://localhost:5500/uploads/images/defaultUser.png";
 
     // تشفير الباسورد
     const hashedPassword = await hashPassword(password);

@@ -12,9 +12,13 @@ import askForChangePasswordRouter from "./Router/askForChangePassword.js";
 import verifyChangePasswordRouter from "./Router/verifyChangePassword.js";
 import changePassword from "./Router/changePassword.js";
 import acceptidentityRouter from "./Router/acceptIdentity.js";
+import reqCreateStore from "./Router/reqCreateStore.js";
+import verifyStorePhoneNumberRouter from "./Router/verifyStorePhonNumber.js";
 import bot from "./lib/bot.js";
 import askForIdentityImageVerifier from "./Router/askForIdentityImageVerifie.js";
 import logoutRouter from "./Router/logout.js";
+import regenerateOtpStorePhone from "./Router/regenerateOtpStorePhone.js";
+import acceptStore from "./Router/acceptStore.js";
 dotenv.config();
 const app = express();
 app.use("/uploads", express.static("uploads"));
@@ -32,6 +36,10 @@ app.use("/api/v1/change-password", changePassword);
 app.use("/api/v1/ask-for-identity-image-verifier", askForIdentityImageVerifier);
 app.use("/api/v1/accept-identity", acceptidentityRouter);
 app.use("/api/v1/logout", logoutRouter);
+app.use("/api/v1/req-create-store", reqCreateStore);
+app.use("/api/v1/verify-store-phone-number", verifyStorePhoneNumberRouter);
+app.use("/api/v1/regenerate-otp-store-phone", regenerateOtpStorePhone);
+app.use("/api/v1/accept-store", acceptStore);
 
 app.get("/", (req, res) => {
   res.send("Server is running");
